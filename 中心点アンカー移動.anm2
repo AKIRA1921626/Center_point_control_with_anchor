@@ -16,13 +16,13 @@ local w,h = obj.getpixel()
 -- obj.w,obj.h,とobj.getpixel()では仕様の違いによりなんらかの問題があったことは覚えているが、その問題がこのスクリプトにも影響するかは覚えていない。
 -- その問題点は、rikky氏の「スクリプト講習会」のどこかの回で触れられていたことを記憶している。
 
--- オブジェクトの拡大率を変数zoomに代入。
+-- オブジェクトの拡大率を変数scaleに代入。
 local scale = obj.zoom * ( obj.getvalue("zoom") / 100 )
 -- obj.zoomは拡大率(1.0=等倍)。obj.getvalue("zoom")の拡大率は(100=等倍)なのでこちらは/100。
 -- なぜobj.zoomとobj.getvalue("zoom") / 100をかけるのかは正直良くわからないが、参考にしたスクリプトではこうしていたので真似している。
 
 -- check「移動距離をパーセンテージにする」のcheckがONかOFFかによって変数に代入
-local distance = nil -- ifの外側で変数を宣言と代入をしてスコープの問題を回避
+local distance = nil -- ifの外側で変数を宣言と代入をしてスコープの問題を回避。何も代入していないときも勝手に = nil が行われるらしいので、=nilはなくても動くようだ。
 if( percentage ~= 0 ) then
     distance = obj.w / 100 -- この時は移動距離をパーセンテージ化する。
 else
@@ -30,18 +30,18 @@ else
 end
 
 -- check「トラックバーの数値を無効化」のcheckがONかOFFかによって変数に代入
-local disable = nil -- ifの外側で変数を宣言と代入をしてスコープの問題を回避
+local disable = nil -- ifの外側で変数を宣言と代入をしてスコープの問題を回避。何も代入していないときも勝手に = nil が行われるらしいので、=nilはなくても動くようだ。
 if( reset ~= 0 ) then
     disable = 0 -- このときはdisableに0を代入し、後にexact_location変数に*disableを行い、トラックバーの数値を無効化。
 else
     disable = 1 -- このときはdisableに1を代入し、後にexact_location変数に*disableを行い、トラックバーの数値をそのまま適用。
 end
 
--- これらはw,hに/や-を付ければ変数を作らなくとも操作可能だが、可読性向上のために新たに変数として作成するものとする。
+-- これらはw,hに/2や-,*0を付ければ変数を作らなくとも操作可能だが、可読性向上のために新たに変数として作成するものとする。
 local half_w = w / 2 -- wを2で割って半分にした値を代入する変数を作成。
 local half_h = h / 2 -- hを2で割って半分にした値を代入する変数を作成。
-local minus_w = -w -- wの符号を反転させた変数を作成。
-local minus_h = -h -- hの符号を反転させた変数を作成。
+local minus_w = -w -- wの符号を反転させた変数を作成。使う機会はなかったが、一応残しておく。
+local minus_h = -h -- hの符号を反転させた変数を作成。使う機会はなかったが、一応残しておく。
 local minus_half_w = -(w / 2) -- wを2で割って半分にし符号を反転させた変数を作成。
 local minus_half_h = -(h / 2) -- hを2で割って半分にし符号を反転させた変数を作成。
 local center_w = w * 0 -- wに*0をすることで、wの値を0とするという目的を明確化。
@@ -55,11 +55,11 @@ use_locationに[appr_location]を入れる事で、各種テーブル変数に�
 Luaのテーブルでは添字は0からではなく1から始まる。]]
 if(use_location[appr_location] == "anker") then -- アンカーの数値で中心点を変更。アンカーを移動させることで中心点を連動して移動させる。
     obj.setanchor("pos",1)
-    obj.cx = pos[1] + exact_location_x * disable * distance
-    obj.cy = pos[2] + exact_location_y * disable * distance
+    obj.cx = pos[1] + exact_location_x * disable * distance -- 「移動距離をパーセンテージにする」関連変数のdistanceをかけることで、トラックバーの値をパーセンテージにするか絶対値にするかを決めている。
+    obj.cy = pos[2] + exact_location_y * disable * distance -- 「トラックバーの数値を無効化」関連変数のdisableは、checkのON/OFFで0か1が代入される。それをトラックバーの変数にかけることで、無効化もしくはそのままにするかを決めている。
     obj.cz = exact_location_z * disable
     if( lotate_type == 0 ) then
-        obj.ox = ( pos[1] + exact_location_x * disable * distance ) * scale
+        obj.ox = ( pos[1] + exact_location_x * disable * distance ) * scale -- 「中心タイプ」が「回転重視」ならばscaleをかけて拡大率を数値に片影している。
         obj.oy = ( pos[2]  + exact_location_y * disable * distance ) * scale
         obj.oz = exact_location_z * disable
     elseif( lotate_type == 1 ) then
