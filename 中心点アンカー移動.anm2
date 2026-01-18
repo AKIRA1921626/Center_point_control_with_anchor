@@ -1,6 +1,6 @@
 --label:配置
 --information:中心点の移動を行いやすくするためのAviutl2用のスクリプトです。
---select@appr_location:位置=1,トラックバーの数値=1,アンカー=2,左上(固定)=3,真ん中上(固定)=4,右上(固定)=5,右端(固定)=6,右下(固定)=7,真ん中下(固定)=8,左下(固定)=9,左端(固定)=10
+--select@appr_location:位置=1,トラックバーの数値=1,アンカー=2,左上(固定)=3,真ん中上(固定)=4,右上(固定)=5,右端(固定)=6,右下(固定)=7,真ん中下(固定)=8,左下(固定)=9,左端(固定)=10,中央(固定)=11
 --track@exact_location_x:中心x,-5000,5000,0,0.1
 --track@exact_location_y:中心y,-5000,5000,0,0.1
 --select@lotate_type:中心タイプ=0,回転重視=0,拡大重視=1
@@ -27,7 +27,7 @@ local center_w = w * 0 -- wに*0をすることで、wの値を0とするとい�
 local center_h = h * 0 -- hに*0をすることで、hの値を0とするという目的を明確化。
 
 -- 実際に使うためのテーブル変数を作成。この時点ではテーブル変数を作成するだけ。使用はif文の中で行う。
-local use_location = {"track","anker","topleft","uppercenter","topright","centerright","bottomright","bottomcenter","bottomleft","centerleft"}
+local use_location = {"track","anker","topleft","uppercenter","topright","centerright","bottomright","bottomcenter","bottomleft","centerleft","center"}
 
 --[[ ここはリスト選択項目@appr_locatioに依存する。
 use_locationに[appr_location]を入れる事で、各種テーブル変数にアクセス。
@@ -131,6 +131,16 @@ elseif(use_location[appr_location] == "centerleft") then -- 中心点を左橋�
         obj.oy = center_h * scale
     elseif( lotate_type == 1 ) then
         obj.ox = minus_half_w
+        obj.oy = center_h
+    end
+    elseif(use_location[appr_location] == "center") then -- 中心点を中央に固定して変更。
+    obj.cx = center_w
+    obj.cy = center_h
+    if( lotate_type == 0 ) then
+        obj.ox = center_w * scale
+        obj.oy = center_h * scale
+    elseif( lotate_type == 1 ) then
+        obj.ox = center_w
         obj.oy = center_h
     end
 end
