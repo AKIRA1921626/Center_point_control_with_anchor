@@ -22,7 +22,7 @@ local scale = obj.zoom * ( obj.getvalue("zoom") / 100 )
 -- なぜobj.zoomとobj.getvalue("zoom") / 100をかけるのかは正直良くわからないが、参考にしたスクリプトではこうしていたので真似している。
 
 -- check「移動距離をパーセンテージにする」のcheckがONかOFFかによって変数に代入
-local distance -- ifの外側で変数を宣言と代入をしてスコープの問題を回避
+local distance = nil -- ifの外側で変数を宣言と代入をしてスコープの問題を回避
 if( percentage ~= 0 ) then
     distance = obj.w / 100 -- この時は移動距離をパーセンテージ化する。
 else
@@ -30,7 +30,7 @@ else
 end
 
 -- check「トラックバーの数値を無効化」のcheckがONかOFFかによって変数に代入
-local disable -- ifの外側で変数を宣言と代入をしてスコープの問題を回避
+local disable = nil -- ifの外側で変数を宣言と代入をしてスコープの問題を回避
 if( reset ~= 0 ) then
     disable = 0 -- このときはdisableに0を代入し、後にexact_location変数に*disableを行い、トラックバーの数値を無効化。
 else
