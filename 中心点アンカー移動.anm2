@@ -23,6 +23,8 @@ local minus_w = -w -- wの符号を反転させた変数を作成。
 local minus_h = -h -- hの符号を反転させた変数を作成。
 local minus_half_w = -(w / 2) -- wを2で割って半分にし符号を反転させた変数を作成。
 local minus_half_h = -(h / 2) -- hを2で割って半分にし符号を反転させた変数を作成。
+local center_w = w * 0 -- wに*0をすることで、wの値を0とするという目的を明確化。
+local center_h = h * 0 -- hに*0をすることで、hの値を0とするという目的を明確化。
 
 -- 実際に使うためのテーブル変数を作成。この時点ではテーブル変数を作成するだけ。使用はif文の中で行う。
 local use_location = {"track","anker","topleft","uppercenter","topright","centerright","bottomright","bottomcenter","bottomleft","centerleft"}
@@ -62,13 +64,13 @@ elseif(use_location[appr_location] == "topleft") then -- 中心点を左上に�
         obj.oy = minus_half_h
     end
 elseif(use_location[appr_location] == "uppercenter") then -- 中心点を真ん中上に固定して変更。
-    obj.cx = 0
+    obj.cx = center_w
     obj.cy = minus_half_h
     if( lotate_type == 0 ) then
-        obj.ox = 0 * scale
+        obj.ox = center_w * scale
         obj.oy = minus_half_h * scale
     elseif( lotate_type == 1 ) then
-        obj.ox = 0
+        obj.ox = center_w
         obj.oy = minus_half_h
     end
 elseif(use_location[appr_location] == "topright")  then -- 中心点を右上に固定して変更。
@@ -83,13 +85,13 @@ elseif(use_location[appr_location] == "topright")  then -- 中心点を右上に
     end
 elseif(use_location[appr_location] == "centerright") then -- 中心点を右端に固定して変更。
     obj.cx = half_w
-    obj.cy = 0
+    obj.cy = center_h
     if( lotate_type == 0 ) then
         obj.ox = half_w * scale
-        obj.oy = 0 * scale
+        obj.oy = center_h * scale
     elseif( lotate_type == 1 ) then
         obj.ox = half_w
-        obj.oy = 0
+        obj.oy = center_h
     end
 elseif(use_location[appr_location] == "bottomright") then -- 中心点を右下に固定して変更。
     obj.cx = half_w
@@ -102,13 +104,13 @@ elseif(use_location[appr_location] == "bottomright") then -- 中心点を右下�
         obj.oy = half_h
     end
 elseif(use_location[appr_location] == "bottomcenter") then -- 中心点を真ん中下に固定して変更。
-    obj.cx = 0
+    obj.cx = center_w
     obj.cy = half_h
     if( lotate_type == 0 ) then
-        obj.ox = 0 * scale
+        obj.ox = center_w * scale
         obj.oy = half_h * scale
     elseif( lotate_type == 1 ) then
-        obj.ox = 0
+        obj.ox = center_w
         obj.oy = half_h
     end
 elseif(use_location[appr_location] == "bottomleft") then -- 中心点を左下に固定して変更。
@@ -123,12 +125,12 @@ elseif(use_location[appr_location] == "bottomleft") then -- 中心点を左下�
     end
 elseif(use_location[appr_location] == "centerleft") then -- 中心点を左橋に固定して変更。
     obj.cx = minus_half_w
-    obj.cy = 0
+    obj.cy = center_h
     if( lotate_type == 0 ) then
         obj.ox = minus_half_w * scale
-        obj.oy = 0 * scale
+        obj.oy = center_h * scale
     elseif( lotate_type == 1 ) then
         obj.ox = minus_half_w
-        obj.oy = 0
+        obj.oy = center_h
     end
 end
