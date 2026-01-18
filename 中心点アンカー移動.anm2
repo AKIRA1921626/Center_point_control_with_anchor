@@ -8,11 +8,13 @@
 --value@pos:中心座標,{0,0}
 --group
 
-local w,h = obj.getpixel() -- オブジェクトの縦と横の位置を変数w,hに代入。obj.getpixel()は引数を指定しなければ、そのobjのwとhを返す。
+-- オブジェクトの縦と横の位置を変数w,hに代入。obj.getpixel()は引数を指定しなければ、そのobjのwとhを返す。
+local w,h = obj.getpixel()
 -- obj.w,obj.h,とobj.getpixel()では仕様の違いによりなんらかの問題があったことは覚えているが、その問題がこのスクリプトにも影響するかは覚えていない。
 -- その問題点は、rikky氏の「スクリプト講習会」のどこかの回で触れられていたことを記憶している。
 
-local scale = obj.zoom * ( obj.getvalue("zoom") / 100 )  -- オブジェクトの拡大率を変数zoomに代入。
+-- オブジェクトの拡大率を変数zoomに代入。
+local scale = obj.zoom * ( obj.getvalue("zoom") / 100 )
 -- obj.zoomは拡大率(1.0=等倍)。obj.getvalue("zoom")の拡大率は(100=等倍)なのでこちらは/100。
 -- なぜobj.zoomとobj.getvalue("zoom") / 100をかけるのかは正直良くわからないが、参考にしたスクリプトではこうしていたので真似している。
 
