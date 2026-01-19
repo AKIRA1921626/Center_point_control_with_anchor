@@ -69,146 +69,146 @@ use_locationに[appr_location]を入れる事で、各種テーブル変数に�
 Luaのテーブルでは添字は0からではなく1から始まる。]]
 if(use_location[appr_location] == "anker") then -- アンカーの数値で中心点を変更。アンカーを移動させることで中心点を連動して移動させる。
     obj.setanchor("pos",1)
-    obj.cx = ( pos[1] + exact_location_x * disable ) * distance -- 「移動距離をパーセンテージにする」関連変数のdistanceをかけることで、トラックバーの値をパーセンテージにするか絶対値にするかを決めている。
-    obj.cy = ( pos[2] + exact_location_y * disable ) * distance --  「位置補正」がONならば関連変数p_correctは1となり数値はそのまま適用され、OFFならば-1となり数値は反転される。
+    obj.cx = pos[1] + ( exact_location_x * distance * disable ) -- 「移動距離をパーセンテージにする」関連変数のdistanceをかけることで、トラックバーの値をパーセンテージにするか絶対値にするかを決めている。
+    obj.cy = pos[2] + ( exact_location_y * distance * disable )-- 「位置補正」がONならば関連変数p_correctは1となり数値はそのまま適用され、OFFならば-1となり数値は反転される。
     obj.cz = ( exact_location_z * disable )
     if( rotate_type == 0 ) then
-        obj.ox = ( pos[1] + exact_location_x * disable ) * p_correct * distance * scale -- 「トラックバーの数値を無効化」関連変数のdisableは、checkのON/OFFで0か1が代入される。それをトラックバーの変数にかけることで、無効化もしくはそのままにするかを決めている。
-        obj.oy = ( pos[2]  + exact_location_y * disable ) * p_correct * distance * scale -- 「中心タイプ」が「回転重視」ならばscaleをかけて拡大率を数値に反映している。
+        obj.ox = ( pos[1] + ( exact_location_x * distance * disable ) ) * p_correct * scale -- 「トラックバーの数値を無効化」関連変数のdisableは、checkのON/OFFで0か1が代入される。それをトラックバーの変数にかけることで、無効化もしくはそのままにするかを決めている。
+        obj.oy = ( pos[2] + ( exact_location_y * distance * disable ) )* p_correct * scale -- 「中心タイプ」が「回転重視」ならばscaleをかけて拡大率を数値に反映している。
         obj.oz = ( exact_location_z * disable )
     elseif( rotate_type == 1 ) then
-        obj.ox = ( pos[1] + exact_location_x * disable ) * p_correct * distance
-        obj.oy = ( pos[2] + exact_location_y * disable ) * p_correct * distance
-        obj.oz = ( exact_location_z )
+        obj.ox = ( pos[1] + ( exact_location_x * distance * disable ) ) * p_correct
+        obj.oy = ( pos[2] + ( exact_location_y * distance * disable ) ) * p_correct
+        obj.oz = ( exact_location_z * disable )
     end
 elseif(use_location[appr_location] == "track") then -- トラックバーの数値で中心点を変更。
-    obj.cx = ( exact_location_x * disable ) * distance
-    obj.cy = ( exact_location_y * disable ) * distance
+    obj.cx = ( exact_location_x * distance * disable )
+    obj.cy = ( exact_location_y * distance * disable )
     obj.cz = ( exact_location_z * disable )
     if( rotate_type == 0 ) then
-        obj.ox = ( exact_location_x * disable ) * p_correct * distance * scale
-        obj.oy = ( exact_location_y * disable ) * p_correct * distance * scale
+        obj.ox = ( exact_location_x * distance * disable ) * p_correct * scale
+        obj.oy = ( exact_location_y * distance * disable ) * p_correct * scale
         obj.oz = ( exact_location_z * disable )
     elseif( rotate_type == 1 ) then
-        obj.ox = ( exact_location_x * disable ) * p_correct * distance
-        obj.oy = ( exact_location_y * disable ) * p_correct * distance
+        obj.ox = ( exact_location_x * distance * disable ) * p_correct
+        obj.oy = ( exact_location_y * distance * disable ) * p_correct
         obj.oz = ( exact_location_z * disable )
     end
 elseif(use_location[appr_location] == "topleft") then -- 中心点を左上に変更。
-    obj.cx = ( minus_half_w + exact_location_x * disable ) * distance
-    obj.cy = ( minus_half_h + exact_location_y * disable ) * distance
+    obj.cx = minus_half_w + ( exact_location_x * distance * disable )
+    obj.cy = ( minus_half_h + exact_location_y * distance * disable )
     obj.cz = ( exact_location_z * disable )
     if( rotate_type == 0 ) then
-        obj.ox = ( minus_half_w + exact_location_x * disable ) * p_correct * distance * scale
-        obj.oy = ( minus_half_h + exact_location_y * disable ) * p_correct * distance * scale
+        obj.ox = ( minus_half_w + ( exact_location_x * distance * disable ) ) * p_correct * scale
+        obj.oy = ( minus_half_h + ( exact_location_y * distance * disable ) ) * p_correct * scale
         obj.oz = ( exact_location_z * disable )
     elseif( rotate_type == 1 ) then
-        obj.ox = ( minus_half_w + exact_location_x * disable ) * p_correct * distance
-        obj.oy = ( minus_half_h + exact_location_y * disable ) * p_correct * distance
+        obj.ox = ( minus_half_w + ( exact_location_x * distance * disable ) ) * p_correct
+        obj.oy = ( minus_half_h + ( exact_location_y * distance * disable ) ) * p_correct
         obj.oz = ( exact_location_z * disable )
     end
 elseif(use_location[appr_location] == "uppercenter") then -- 中心点を真ん中上に変更。
-    obj.cx = ( center_w + exact_location_x * disable ) * distance
-    obj.cy = ( minus_half_h + exact_location_y * disable ) * distance
+    obj.cx = center_w + ( exact_location_x * distance * disable )
+    obj.cy = minus_half_h + ( exact_location_y * distance * disable )
     obj.cz = ( exact_location_z * disable )
     if( rotate_type == 0 ) then
-        obj.ox = ( center_w + exact_location_x * disable ) * p_correct * distance * scale
-        obj.oy = ( minus_half_h + exact_location_y * disable ) * p_correct * distance * scale
+        obj.ox = ( center_w + ( exact_location_x * distance * disable ) ) * p_correct * scale
+        obj.oy = ( minus_half_h + ( exact_location_y * distance * disable ) ) * p_correct * scale
         obj.oz = ( exact_location_z * disable )
     elseif( rotate_type == 1 ) then
-        obj.ox = ( center_w + exact_location_x * disable ) * p_correct * distance
-        obj.oy = ( minus_half_h + exact_location_y * disable ) * p_correct * distance
+        obj.ox = ( center_w + ( exact_location_x * distance * disable ) ) * p_correct
+        obj.oy = ( minus_half_h + ( exact_location_y * distance * disable ) ) * p_correct
         obj.oz = ( exact_location_z * disable )
     end
 elseif(use_location[appr_location] == "topright")  then -- 中心点を右上に変更。
-    obj.cx = ( half_w + exact_location_x * disable ) * distance
-    obj.cy = ( minus_half_h + exact_location_y * disable ) * distance
+    obj.cx = half_w + ( exact_location_x * distance * disable )
+    obj.cy = minus_half_h + ( exact_location_y * distance * disable )
     obj.cz = ( exact_location_z * disable )
     if( rotate_type == 0 ) then
-        obj.ox = ( half_w + exact_location_x * disable ) * p_correct * distance * scale
-        obj.oy = ( minus_half_h + exact_location_y * disable ) * p_correct * distance * scale
+        obj.ox = ( half_w + ( exact_location_x * distance * disable ) ) * p_correct * scale
+        obj.oy = ( minus_half_h + ( exact_location_y * distance * disable ) ) * p_correct * scale
         obj.oz = ( exact_location_z * disable )
     elseif( rotate_type == 1 ) then
-        obj.ox = ( half_w + exact_location_x * disable ) * p_correct * distance
-        obj.oy = ( minus_half_h + exact_location_y * disable ) * p_correct * distance
+        obj.ox = ( half_w + ( exact_location_x * distance * disable ) ) * p_correct
+        obj.oy = ( minus_half_h + ( exact_location_y * distance * disable ) ) * p_correct
         obj.oz = ( exact_location_z * disable )
     end
 elseif(use_location[appr_location] == "centerright") then -- 中心点を右端に変更。
-    obj.cx = ( half_w + exact_location_x * disable ) * distance
-    obj.cy = ( center_h + exact_location_y * disable ) * distance
+    obj.cx = half_w + ( exact_location_x * distance * disable )
+    obj.cy = center_h +( exact_location_y * distance * disable )
     obj.cz = ( exact_location_z * disable )
     if( rotate_type == 0 ) then
-        obj.ox = ( half_w + exact_location_x * disable ) * p_correct * distance * scale
-        obj.oy = ( center_h + exact_location_y * disable ) * p_correct * distance * scale
+        obj.ox = ( half_w + ( exact_location_x * distance * disable ) ) * p_correct * scale
+        obj.oy = ( center_h + ( exact_location_y * distance * disable ) ) * p_correct * scale
         obj.oz = ( exact_location_z * disable )
     elseif( rotate_type == 1 ) then
-        obj.ox = ( half_w + exact_location_x * disable ) * p_correct * distance
-        obj.oy = ( center_h + exact_location_y * disable ) * p_correct * distance
+        obj.ox = ( half_w + ( exact_location_x * distance * disable ) ) * p_correct
+        obj.oy = ( center_h + ( exact_location_y * distance * disable ) ) * p_correct
         obj.oz = ( exact_location_z * disable )
     end
 elseif(use_location[appr_location] == "bottomright") then -- 中心点を右下に変更。
-    obj.cx = ( half_w + exact_location_x * disable ) * distance
-    obj.cy = ( half_h + exact_location_y * disable ) * distance
+    obj.cx = half_w + ( exact_location_x * distance * disable )
+    obj.cy = half_h + ( exact_location_y * distance * disable )
     obj.cz = ( exact_location_z * disable )
     if( rotate_type == 0 ) then
-        obj.ox = ( half_w + exact_location_x * disable ) * p_correct * distance * scale
-        obj.oy = ( half_h + exact_location_y * disable ) * p_correct * distance * scale
+        obj.ox = ( half_w + ( exact_location_x * distance * disable ) ) * p_correct * scale
+        obj.oy = ( half_h + ( exact_location_y * distance * disable ) ) * p_correct * scale
         obj.oz = ( exact_location_z * disable )
     elseif( rotate_type == 1 ) then
-        obj.ox = ( half_w + exact_location_x * disable ) * p_correct * distance
-        obj.oy = ( half_h + exact_location_y * disable ) * p_correct * distance
+        obj.ox = ( half_w + ( exact_location_x * distance * disable ) ) * p_correct
+        obj.oy = ( half_h + ( exact_location_y * distance * disable ) ) * p_correct
         obj.oz = ( exact_location_z * disable )
     end
 elseif(use_location[appr_location] == "bottomcenter") then -- 中心点を真ん中下に変更。
-    obj.cx = ( center_w + exact_location_x * disable ) * distance
-    obj.cy = ( half_h + exact_location_y * disable ) * distance
+    obj.cx = center_w + ( exact_location_x * distance * disable )
+    obj.cy = half_h + ( exact_location_y * distance * disable )
     obj.cz = ( exact_location_z * disable )
     if( rotate_type == 0 ) then
-        obj.ox = ( center_w + exact_location_x * disable ) * p_correct * distance * scale
-        obj.oy = ( half_h + exact_location_y * disable ) * p_correct * distance * scale
+        obj.ox = ( center_w + ( exact_location_x * distance * disable ) ) * p_correct * scale
+        obj.oy = ( half_h + ( exact_location_y * distance * disable ) ) * p_correct * scale
         obj.oz = ( exact_location_z * disable )
     elseif( rotate_type == 1 ) then
-        obj.ox = ( center_w + exact_location_x * disable ) * p_correct * distance
-        obj.oy = ( half_h + exact_location_y * disable ) * p_correct * distance
+        obj.ox = ( center_w + ( exact_location_x * distance * disable ) ) * p_correct
+        obj.oy = ( half_h + ( exact_location_y * distance * disable ) ) * p_correct
         obj.oz = ( exact_location_z * disable )
     end
 elseif(use_location[appr_location] == "bottomleft") then -- 中心点を左下に変更。
-    obj.cx = ( minus_half_w + exact_location_x * disable ) * distance
-    obj.cy = ( half_h + exact_location_y * disable ) * distance
+    obj.cx = minus_half_w + ( exact_location_x * distance * disable )
+    obj.cy = half_h + ( exact_location_y * distance * disable )
     obj.cz = ( exact_location_z * disable )
     if( rotate_type == 0 ) then
-        obj.ox = ( minus_half_w + exact_location_x * disable ) * p_correct * distance * scale
-        obj.oy = ( half_h + exact_location_y * disable ) * p_correct * distance * scale
+        obj.ox = ( minus_half_w + ( exact_location_x * distance * disable ) ) * p_correct * scale
+        obj.oy = ( half_h + ( exact_location_y * distance * disable ) ) * p_correct * scale
         obj.oz = ( exact_location_z * disable )
     elseif( rotate_type == 1 ) then
-        obj.ox = ( minus_half_w + exact_location_x * disable ) * p_correct * distance
-        obj.oy = ( half_h + exact_location_y * disable ) * p_correct * distance
+        obj.ox = ( minus_half_w + ( exact_location_x * distance * disable ) ) * p_correct
+        obj.oy = ( half_h + ( exact_location_y * distance * disable ) ) * p_correct
         obj.oz = ( exact_location_z * disable )
     end
 elseif(use_location[appr_location] == "centerleft") then -- 中心点を左端に変更。
-    obj.cx = ( minus_half_w + exact_location_x * disable )  * distance
-    obj.cy = ( center_h + exact_location_y * disable )  * distance
+    obj.cx = minus_half_w + ( exact_location_x * distance * disable )
+    obj.cy = center_h + ( exact_location_y * disable * distance )
     obj.cz = ( exact_location_z * disable )
     if( rotate_type == 0 ) then
-        obj.ox = ( minus_half_w + exact_location_x * disable ) * p_correct * distance * scale
-        obj.oy = ( center_h  + exact_location_y * disable ) * p_correct * distance * scale
+        obj.ox = ( minus_half_w + ( exact_location_x * distance * disable ) ) * p_correct * scale
+        obj.oy = ( center_h  + ( exact_location_y * distance * disable ) ) * p_correct * scale
         obj.oz = ( exact_location_z * disable )
     elseif( rotate_type == 1 ) then
-        obj.ox = ( minus_half_w + exact_location_x * disable ) * p_correct * distance
-        obj.oy = ( center_h + exact_location_y * disable ) * p_correct * distance
+        obj.ox = ( minus_half_w + ( exact_location_x * distance * disable ) ) * p_correct
+        obj.oy = ( center_h + ( exact_location_y * distance * disable ) )* p_correct
         obj.oz = ( exact_location_z * disable )
     end
-    elseif(use_location[appr_location] == "center") then -- 中心点を中央に変更。
-    obj.cx = ( center_w + exact_location_x * disable ) * distance
-    obj.cy = ( center_h + exact_location_y * disable ) * distance
+elseif(use_location[appr_location] == "center") then -- 中心点を中央に変更。
+    obj.cx = center_w + ( exact_location_x * distance * disable )
+    obj.cy = center_h + ( exact_location_y * distance * disable )
     obj.cz = ( exact_location_z * disable )
     if( rotate_type == 0 ) then
-        obj.ox = ( center_w + exact_location_x * disable ) * p_correct * distance * scale
-        obj.oy = ( center_h + exact_location_y * disable ) * p_correct * distance * scale
+        obj.ox = ( center_w + ( exact_location_x * distance * disable ) ) * p_correct * scale
+        obj.oy = ( center_h + ( exact_location_y * distance * disable ) ) * p_correct * scale
         obj.oz = ( exact_location_z * disable )
     elseif( rotate_type == 1 ) then
-        obj.ox = ( center_w + exact_location_x * disable ) * p_correct * distance
-        obj.oy = ( center_h + exact_location_y * disable ) * p_correct * distance
+        obj.ox = ( center_w + ( exact_location_x * distance * disable ) ) * p_correct
+        obj.oy = ( center_h + ( exact_location_y * distance * disable ) ) * p_correct
         obj.oz = ( exact_location_z * disable )
     end
 end
