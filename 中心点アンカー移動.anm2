@@ -74,7 +74,7 @@ if(use_location[appr_location] == "anker") then -- アンカーの数値で中�
     obj.cz = ( exact_location_z * disable )
     if( rotate_type == 0 ) then
         obj.ox = ( pos[1] + ( exact_location_x * distance * disable ) ) * p_correct * scale -- 「トラックバーの数値を無効化」関連変数のdisableは、checkのON/OFFで0か1が代入される。それをトラックバーの変数にかけることで、無効化もしくはそのままにするかを決めている。
-        obj.oy = ( pos[2] + ( exact_location_y * distance * disable ) )* p_correct * scale -- 「中心タイプ」が「回転重視」ならばscaleをかけて拡大率を数値に反映している。
+        obj.oy = ( pos[2] + ( exact_location_y * distance * disable ) ) * p_correct * scale -- 「中心タイプ」が「回転重視」ならばscaleをかけて拡大率を数値に反映している。
         obj.oz = ( exact_location_z * disable )
     elseif( rotate_type == 1 ) then
         obj.ox = ( pos[1] + ( exact_location_x * distance * disable ) ) * p_correct
