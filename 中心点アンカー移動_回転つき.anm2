@@ -1,0 +1,230 @@
+--label:配置
+--information:中心点の移動を行いやすくするためのAviutl2用のスクリプトです。
+--select@appr_location:位置=1,アンカー=1,トラックバー=2,左上=3,真ん中上=4,右上=5,右端=6,右下=7,真ん中下=8,左下=9,左端=10,中央=11
+--track@exact_location_x:中心X,-5000,5000,0,0.1
+--track@exact_location_y:中心Y,-5000,5000,0,0.1
+--track@exact_location_z:中心Z,-5000,5000,0,0.1
+--check@position_correction:位置補正,1
+--check@reset_location:トラックバーの中心(X)(Y)(Z)の数値を無効化,0
+--track@rotate_x:回転X,-3600,3600,0,0.1
+--track@rotate_y:回転Y,-3600,3600,0,0.1
+--track@rotate_z:回転Z,-3600,3600,0,0.1
+--check@reset_rotate:トラックバーの回転(X)(Y)(Z)の数値を無効化,0
+--group:詳細設定,false
+--value@pos:アンカー座標,{0,0}
+--select@location_type:中心タイプ=0,回転重視=0,拡大重視=1
+--check@percentage:移動距離をパーセンテージにする,1
+--group
+
+
+-- オブジェクトの縦と横の位置を変数w,hに代入。obj.getpixel()は引数を指定しなければ、そのobjのwとhを返す。
+local w,h = obj.getpixel()
+-- obj.w,obj.h,とobj.getpixel()では仕様の違いによりなんらかの問題があったことは覚えているが、その問題がこのスクリプトにも影響するかは覚えていない。
+-- その問題点は、rikky氏の「スクリプト講習会」のpart4の9:16において、この点については触れられている。
+
+-- オブジェクトの拡大率を変数scaleに代入。
+local scale = ( obj.getvalue("zoom") / 100 )
+-- obj.getvalue("zoom")の拡大率は(100=等倍)なのでこちらは/100。
+-- obj.zoomでは拡大率に関係なく、常に値が1になってしまうようなので、obj.getvalue("zoom")を使用する。
+--[[
+debug_print(obj.zoom)
+debug_print(obj.getvalue("zoom"))
+で確認。
+]]
+
+-- check「移動距離をパーセンテージにする」のcheckがONかOFFかによって変数に代入。
+local distance = 1 -- ifの外側で変数を宣言と代入をしてスコープの問題を回避。
+if( percentage ~= 0 ) then
+    distance = w / 100 -- この時は移動距離をパーセンテージ化する。
+else
+    distance = 1 -- この時は移動距離を絶対値にする。
+end
+
+-- check「トラックバーの中心(X)(Y)(Z)の数値を無効化」のcheckがONかOFFかによって変数に代入。
+local disable = 1 -- ifの外側で変数を宣言と代入をしてスコープの問題を回避。
+if( reset_location ~= 0 ) then
+    disable = 0 -- このときはdisableに0を代入し、後にexact_location変数に*disableを行い、トラックバーの数値を無効化。
+else
+    disable = 1 -- このときはdisableに1を代入し、後にexact_location変数に*disableを行い、トラックバーの数値をそのまま適用。
+end
+
+-- check「位置補正」のcheckがONかOFFかによって変数に代入
+local p_correct = 1  -- ifの外側で変数を宣言と代入をしてスコープの問題を回避。
+if( position_correction ~= 0 ) then
+    p_correct = 1 -- このとき、checkがONならば、p_correctに1を代入し、後の処理での数値をそのままにする。
+else
+    p_correct = 0  -- このとき、checkがOFFならば、p_correctに0を代入し、後の処理では中心点は移動させず、見かけ上の座標だけを移動させる。
+end
+
+-- これらはw,hに/2や-,*0を付ければ変数を作らなくとも操作可能だが、可読性向上のために新たに変数として作成するものとする。
+local half_w = w / 2 -- wを2で割って半分にした値を代入する変数を作成。
+local half_h = h / 2 -- hを2で割って半分にした値を代入する変数を作成。
+local minus_w = -w -- wの符号を反転させた変数を作成。使う機会はなかったが、一応残しておく。
+local minus_h = -h -- hの符号を反転させた変数を作成。使う機会はなかったが、一応残しておく。
+local minus_half_w = -(w / 2) -- wを2で割って半分にし符号を反転させた変数を作成。
+local minus_half_h = -(h / 2) -- hを2で割って半分にし符号を反転させた変数を作成。
+local center_w = w * 0 -- wに*0をすることで、wの値を0とするという目的を明確化。
+local center_h = h * 0 -- hに*0をすることで、hの値を0とするという目的を明確化。
+
+-- 実際に使うためのテーブル変数を作成。この時点ではテーブル変数を作成するだけ。使用はif文の中で行う。
+local use_location = {"anker","track","topleft","uppercenter","topright","centerright","bottomright","bottomcenter","bottomleft","centerleft","center"}
+
+--[[ ここはリスト選択項目@appr_locatioに依存する。
+use_locationに[appr_location]を入れる事で、各種テーブル変数にアクセス。
+Luaのテーブルでは添字は0からではなく1から始まる。]]
+if(use_location[appr_location] == "anker") then -- アンカーの数値で中心点を変更。アンカーを移動させることで中心点を連動して移動させる。
+    obj.setanchor("pos",1)
+    obj.cx = pos[1] + ( exact_location_x * distance * disable ) -- 「移動距離をパーセンテージにする」関連変数のdistanceをかけることで、トラックバーの値をパーセンテージにするか絶対値にするかを決めている。
+    obj.cy = pos[2] + ( exact_location_y * distance * disable )-- 「位置補正」がONならば関連変数p_correctは1となり数値はそのまま適用され、OFFならば-1となり数値は反転される。
+    obj.cz = ( exact_location_z * disable )
+    if( location_type == 0 ) then
+        obj.ox = ( pos[1] + ( exact_location_x * distance * disable ) ) * p_correct * scale -- 「トラックバーの数値を無効化」関連変数のdisableは、checkのON/OFFで0か1が代入される。それをトラックバーの変数にかけることで、無効化もしくはそのままにするかを決めている。
+        obj.oy = ( pos[2] + ( exact_location_y * distance * disable ) ) * p_correct * scale -- 「中心タイプ」が「回転重視」ならばscaleをかけて拡大率を数値に反映している。
+        obj.oz = ( exact_location_z * disable )
+    elseif( location_type == 1 ) then
+        obj.ox = ( pos[1] + ( exact_location_x * distance * disable ) ) * p_correct
+        obj.oy = ( pos[2] + ( exact_location_y * distance * disable ) ) * p_correct
+        obj.oz = ( exact_location_z * disable )
+    end
+elseif(use_location[appr_location] == "track") then -- トラックバーの数値で中心点を変更。
+    obj.cx = ( exact_location_x * distance * disable )
+    obj.cy = ( exact_location_y * distance * disable )
+    obj.cz = ( exact_location_z * disable )
+    if( location_type == 0 ) then
+        obj.ox = ( exact_location_x * distance * disable ) * p_correct * scale
+        obj.oy = ( exact_location_y * distance * disable ) * p_correct * scale
+        obj.oz = ( exact_location_z * disable )
+    elseif( location_type == 1 ) then
+        obj.ox = ( exact_location_x * distance * disable ) * p_correct
+        obj.oy = ( exact_location_y * distance * disable ) * p_correct
+        obj.oz = ( exact_location_z * disable )
+    end
+elseif(use_location[appr_location] == "topleft") then -- 中心点を左上に変更。
+    obj.cx = minus_half_w + ( exact_location_x * distance * disable )
+    obj.cy = ( minus_half_h + exact_location_y * distance * disable )
+    obj.cz = ( exact_location_z * disable )
+    if( location_type == 0 ) then
+        obj.ox = ( minus_half_w + ( exact_location_x * distance * disable ) ) * p_correct * scale
+        obj.oy = ( minus_half_h + ( exact_location_y * distance * disable ) ) * p_correct * scale
+        obj.oz = ( exact_location_z * disable )
+    elseif( location_type == 1 ) then
+        obj.ox = ( minus_half_w + ( exact_location_x * distance * disable ) ) * p_correct
+        obj.oy = ( minus_half_h + ( exact_location_y * distance * disable ) ) * p_correct
+        obj.oz = ( exact_location_z * disable )
+    end
+elseif(use_location[appr_location] == "uppercenter") then -- 中心点を真ん中上に変更。
+    obj.cx = center_w + ( exact_location_x * distance * disable )
+    obj.cy = minus_half_h + ( exact_location_y * distance * disable )
+    obj.cz = ( exact_location_z * disable )
+    if( location_type == 0 ) then
+        obj.ox = ( center_w + ( exact_location_x * distance * disable ) ) * p_correct * scale
+        obj.oy = ( minus_half_h + ( exact_location_y * distance * disable ) ) * p_correct * scale
+        obj.oz = ( exact_location_z * disable )
+    elseif( location_type == 1 ) then
+        obj.ox = ( center_w + ( exact_location_x * distance * disable ) ) * p_correct
+        obj.oy = ( minus_half_h + ( exact_location_y * distance * disable ) ) * p_correct
+        obj.oz = ( exact_location_z * disable )
+    end
+elseif(use_location[appr_location] == "topright")  then -- 中心点を右上に変更。
+    obj.cx = half_w + ( exact_location_x * distance * disable )
+    obj.cy = minus_half_h + ( exact_location_y * distance * disable )
+    obj.cz = ( exact_location_z * disable )
+    if( location_type == 0 ) then
+        obj.ox = ( half_w + ( exact_location_x * distance * disable ) ) * p_correct * scale
+        obj.oy = ( minus_half_h + ( exact_location_y * distance * disable ) ) * p_correct * scale
+        obj.oz = ( exact_location_z * disable )
+    elseif( location_type == 1 ) then
+        obj.ox = ( half_w + ( exact_location_x * distance * disable ) ) * p_correct
+        obj.oy = ( minus_half_h + ( exact_location_y * distance * disable ) ) * p_correct
+        obj.oz = ( exact_location_z * disable )
+    end
+elseif(use_location[appr_location] == "centerright") then -- 中心点を右端に変更。
+    obj.cx = half_w + ( exact_location_x * distance * disable )
+    obj.cy = center_h +( exact_location_y * distance * disable )
+    obj.cz = ( exact_location_z * disable )
+    if( location_type == 0 ) then
+        obj.ox = ( half_w + ( exact_location_x * distance * disable ) ) * p_correct * scale
+        obj.oy = ( center_h + ( exact_location_y * distance * disable ) ) * p_correct * scale
+        obj.oz = ( exact_location_z * disable )
+    elseif( location_type == 1 ) then
+        obj.ox = ( half_w + ( exact_location_x * distance * disable ) ) * p_correct
+        obj.oy = ( center_h + ( exact_location_y * distance * disable ) ) * p_correct
+        obj.oz = ( exact_location_z * disable )
+    end
+elseif(use_location[appr_location] == "bottomright") then -- 中心点を右下に変更。
+    obj.cx = half_w + ( exact_location_x * distance * disable )
+    obj.cy = half_h + ( exact_location_y * distance * disable )
+    obj.cz = ( exact_location_z * disable )
+    if( location_type == 0 ) then
+        obj.ox = ( half_w + ( exact_location_x * distance * disable ) ) * p_correct * scale
+        obj.oy = ( half_h + ( exact_location_y * distance * disable ) ) * p_correct * scale
+        obj.oz = ( exact_location_z * disable )
+    elseif( location_type == 1 ) then
+        obj.ox = ( half_w + ( exact_location_x * distance * disable ) ) * p_correct
+        obj.oy = ( half_h + ( exact_location_y * distance * disable ) ) * p_correct
+        obj.oz = ( exact_location_z * disable )
+    end
+elseif(use_location[appr_location] == "bottomcenter") then -- 中心点を真ん中下に変更。
+    obj.cx = center_w + ( exact_location_x * distance * disable )
+    obj.cy = half_h + ( exact_location_y * distance * disable )
+    obj.cz = ( exact_location_z * disable )
+    if( location_type == 0 ) then
+        obj.ox = ( center_w + ( exact_location_x * distance * disable ) ) * p_correct * scale
+        obj.oy = ( half_h + ( exact_location_y * distance * disable ) ) * p_correct * scale
+        obj.oz = ( exact_location_z * disable )
+    elseif( location_type == 1 ) then
+        obj.ox = ( center_w + ( exact_location_x * distance * disable ) ) * p_correct
+        obj.oy = ( half_h + ( exact_location_y * distance * disable ) ) * p_correct
+        obj.oz = ( exact_location_z * disable )
+    end
+elseif(use_location[appr_location] == "bottomleft") then -- 中心点を左下に変更。
+    obj.cx = minus_half_w + ( exact_location_x * distance * disable )
+    obj.cy = half_h + ( exact_location_y * distance * disable )
+    obj.cz = ( exact_location_z * disable )
+    if( location_type == 0 ) then
+        obj.ox = ( minus_half_w + ( exact_location_x * distance * disable ) ) * p_correct * scale
+        obj.oy = ( half_h + ( exact_location_y * distance * disable ) ) * p_correct * scale
+        obj.oz = ( exact_location_z * disable )
+    elseif( location_type == 1 ) then
+        obj.ox = ( minus_half_w + ( exact_location_x * distance * disable ) ) * p_correct
+        obj.oy = ( half_h + ( exact_location_y * distance * disable ) ) * p_correct
+        obj.oz = ( exact_location_z * disable )
+    end
+elseif(use_location[appr_location] == "centerleft") then -- 中心点を左端に変更。
+    obj.cx = minus_half_w + ( exact_location_x * distance * disable )
+    obj.cy = center_h + ( exact_location_y * disable * distance )
+    obj.cz = ( exact_location_z * disable )
+    if( location_type == 0 ) then
+        obj.ox = ( minus_half_w + ( exact_location_x * distance * disable ) ) * p_correct * scale
+        obj.oy = ( center_h  + ( exact_location_y * distance * disable ) ) * p_correct * scale
+        obj.oz = ( exact_location_z * disable )
+    elseif( location_type == 1 ) then
+        obj.ox = ( minus_half_w + ( exact_location_x * distance * disable ) ) * p_correct
+        obj.oy = ( center_h + ( exact_location_y * distance * disable ) )* p_correct
+        obj.oz = ( exact_location_z * disable )
+    end
+elseif(use_location[appr_location] == "center") then -- 中心点を中央に変更。
+    obj.cx = center_w + ( exact_location_x * distance * disable )
+    obj.cy = center_h + ( exact_location_y * distance * disable )
+    obj.cz = ( exact_location_z * disable )
+    if( location_type == 0 ) then
+        obj.ox = ( center_w + ( exact_location_x * distance * disable ) ) * p_correct * scale
+        obj.oy = ( center_h + ( exact_location_y * distance * disable ) ) * p_correct * scale
+        obj.oz = ( exact_location_z * disable )
+    elseif( location_type == 1 ) then
+        obj.ox = ( center_w + ( exact_location_x * distance * disable ) ) * p_correct
+        obj.oy = ( center_h + ( exact_location_y * distance * disable ) ) * p_correct
+        obj.oz = ( exact_location_z * disable )
+    end
+end
+
+-- check「トラックバーの回転(X)(Y)(Z)の数値を無効化」のcheckがONかOFFかによって変数に代入
+local nullify = 1 -- ifの外側で変数を宣言と代入をしてスコープの問題を回避。
+if( reset_rotate ~= 0 ) then
+    nullify = 0 -- このときはnullifyに0を代入し、後にrotate_変数に*nullifyを行い、トラックバーの数値を無効化。
+else
+    nullify = 1 -- このときはnullifyに1を代入し、後にrotate_変数に*nullifyを行い、トラックバーの数値をそのまま適用。
+end
+
+-- 回転処理
+obj.effect("回転","X",rotate_x * nullify,"Y",rotate_y * nullify,"Z",rotate_z * nullify)
